@@ -10,7 +10,7 @@ MAXTIME = 126144000
 TOL = 120 / WEEK
 
 @pytest.fixture(scope="module", autouse=True)
-def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_controller, minter, vesting, multisig):
+def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_controller, minter, reward_vesting, multisig):
     alice, bob = accounts[:2]
 
     multisig.initialise([alice, bob], 1)
@@ -48,7 +48,7 @@ def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_
 
     token.set_minter(minter.address, {"from": multisig.address})
     guild_controller.set_minter(minter.address, {"from": multisig.address})
-    vesting.set_minter(minter.address, {"from": multisig.address})
+    reward_vesting.set_minter(minter.address, {"from": multisig.address})
     chain.sleep(10)
 
 def test_add_remove_signers(chain, accounts, guild_controller, multisig):
@@ -164,8 +164,6 @@ def test_approve_then_execute(accounts, guild_controller, multisig):
 
     assert _proposal[2] == 1
 
-    # multisig.approve_proposal(guild_controller.address, 0, {'from': bob})
-
     # submit proposal
     tx3 = multisig.submit_proposal(alice, guild_controller.address, 'toggle_pause', brownie.convert.to_bytes('',type_str='bytes32'), 'toggle_pause')
 
@@ -210,10 +208,6 @@ def test_execute_proposal(accounts, guild_controller, multisig, gas_token, Guild
 
     # increase number of approval
     multisig.set_number_of_approvals(2)
-
-    # # create guild
-    # guild_obj2 = create_guild(chain, guild_controller, gas_token, bob, Guild, multisig)
-    
 
      # add in john
     tx1 = multisig.add_signer(john, {'from': alice})
@@ -282,7 +276,7 @@ def create_guild(chain, guild_controller, gas_token, guild_owner, Guild, multisi
     guild_controller.create_guild(guild_owner, guild_type, guild_rate, {"from": multisig.address})
     guild_address = guild_controller.guild_owner_list(guild_owner)
     guild_contract = Guild.at(guild_address)
-    guild_contract.update_working_balance(guild_owner, {"from": guild_owner})
+
     return guild_contract
 
 
