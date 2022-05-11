@@ -51,16 +51,19 @@ def receiver(accounts):
 
 
 # core contracts
+@pytest.fixture(scope="module")
+def multisig(accounts, Multisig):
+    yield Multisig.deploy({"from": accounts[0]})
 
 @pytest.fixture(scope="module")
-def token(ERC20VRH, accounts):
-    yield ERC20VRH.deploy("Vote Escrowed Token", "VRH", 18, {"from": accounts[0]})
+def token(ERC20VRH, accounts, multisig):
+    yield ERC20VRH.deploy("Vote Escrowed Token", "VRH", 18, {"from": multisig.address})
 
 
 @pytest.fixture(scope="module")
-def voting_escrow(VotingEscrow, accounts, token):
+def voting_escrow(VotingEscrow, accounts, token, multisig):
     yield VotingEscrow.deploy(
-        token, "Voting-escrowed VRH", "veVRH", "veVRH_0.99", {"from": accounts[0]}
+        token, "Voting-escrowed VRH", "veVRH", "veVRH_0.99", {"from": multisig.address}
     )
 
 
@@ -78,22 +81,20 @@ def gas_escrow_template(GasEscrow, accounts, gas_token):
 def guild_template(Guild, accounts):
     yield Guild.deploy({"from": accounts[0]})
 
-
 @pytest.fixture(scope="module")
-def guild_controller(GuildController, accounts, token, guild_template, gas_escrow_template, voting_escrow):
+def guild_controller(GuildController, accounts, token, guild_template, gas_escrow_template, voting_escrow, multisig):
     yield GuildController.deploy(token, voting_escrow, guild_template, gas_escrow_template,
-                                 {"from": accounts[0]})
+                                 {"from": multisig.address})
 
 
 @pytest.fixture(scope="module")
-def reward_vesting(RewardVestingEscrow, accounts):
-    yield RewardVestingEscrow.deploy({"from": accounts[0]})
+def vesting(VestingEscrow, accounts, multisig):
+    yield VestingEscrow.deploy({"from": multisig.address})
 
 
 @pytest.fixture(scope="module")
-def minter(Minter, accounts, guild_controller, token, reward_vesting):
-    yield Minter.deploy(token, guild_controller, reward_vesting, {"from": accounts[0]})
-
+def minter(Minter, accounts, guild_controller, token, vesting):
+    yield Minter.deploy(token, guild_controller, vesting, {"from": accounts[0]})
 
 # VestingEscrow fixtures
 
@@ -106,14 +107,6 @@ def start_time(chain):
 @pytest.fixture(scope="module")
 def end_time(start_time):
     yield start_time + 100000000
-
-
-@pytest.fixture(scope="module")
-def vesting(VestingEscrow, accounts, coin_a, start_time, end_time):
-    contract = VestingEscrow.deploy(coin_a, start_time, end_time, True, accounts[1:5], {"from": accounts[0]})
-    coin_a._mint_for_testing(accounts[0], 10 ** 21)
-    coin_a.approve(contract, 10 ** 21, {"from": accounts[0]})
-    yield contract
 
 
 # testing contracts
