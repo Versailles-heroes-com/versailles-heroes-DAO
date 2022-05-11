@@ -51,16 +51,19 @@ def receiver(accounts):
 
 
 # core contracts
+@pytest.fixture(scope="module")
+def multisig(accounts, Multisig):
+    yield Multisig.deploy({"from": accounts[0]})
 
 @pytest.fixture(scope="module")
-def token(ERC20VRH, accounts):
-    yield ERC20VRH.deploy("Vote Escrowed Token", "VRH", 18, {"from": accounts[0]})
+def token(ERC20VRH, accounts, multisig):
+    yield ERC20VRH.deploy("Vote Escrowed Token", "VRH", 18, {"from": multisig.address})
 
 
 @pytest.fixture(scope="module")
-def voting_escrow(VotingEscrow, accounts, token):
+def voting_escrow(VotingEscrow, accounts, token, multisig):
     yield VotingEscrow.deploy(
-        token, "Voting-escrowed VRH", "veVRH", "veVRH_0.99", {"from": accounts[0]}
+        token, "Voting-escrowed VRH", "veVRH", "veVRH_0.99", {"from": multisig.address}
     )
 
 
@@ -78,22 +81,20 @@ def gas_escrow_template(GasEscrow, accounts, gas_token):
 def guild_template(Guild, accounts):
     yield Guild.deploy({"from": accounts[0]})
 
-
 @pytest.fixture(scope="module")
-def guild_controller(GuildController, accounts, token, guild_template, gas_escrow_template, voting_escrow):
+def guild_controller(GuildController, accounts, token, guild_template, gas_escrow_template, voting_escrow, multisig):
     yield GuildController.deploy(token, voting_escrow, guild_template, gas_escrow_template,
-                                 {"from": accounts[0]})
+                                 {"from": multisig.address})
 
 
 @pytest.fixture(scope="module")
-def vesting(VestingEscrow, accounts):
-    yield VestingEscrow.deploy({"from": accounts[0]})
+def vesting(VestingEscrow, accounts, multisig):
+    yield VestingEscrow.deploy({"from": multisig.address})
 
 
 @pytest.fixture(scope="module")
 def minter(Minter, accounts, guild_controller, token, vesting):
     yield Minter.deploy(token, guild_controller, vesting, {"from": accounts[0]})
-
 
 # VestingEscrow fixtures
 
