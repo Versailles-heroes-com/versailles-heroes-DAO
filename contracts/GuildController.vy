@@ -11,7 +11,7 @@ WEEK: constant(uint256) = 604800
 
 # Cannot change weight votes more often than once in 10 days
 WEIGHT_VOTE_DELAY: constant(uint256) = 10 * 86400
-REQUIRED_CRITERIA: constant(uint256) = 30000
+REQUIRED_CRITERIA: constant(uint256) = 100000
 
 struct Point:
     bias: uint256
@@ -106,7 +106,7 @@ event ChangeGasEscrowContract:
     new_addr: address
 
 MULTIPLIER: constant(uint256) = 10 ** 18
-
+    
 admin: public(address)  # Can and will be a smart contract
 future_admin: public(address)  # Can and will be a smart contract
 
@@ -216,7 +216,7 @@ def commit_transfer_create_guild_ownership(addr: address):
     @notice Transfer ownership of GuildController to `addr`
     @param addr Address to have ownership transferred to
     """
-    assert msg.sender == self.create_guild_admin  # dev: admin only
+    assert msg.sender == self.admin  # dev: admin only
     self.future_create_guild_admin = addr
     log CommitCreateGuildOwnership(addr)
 
@@ -226,7 +226,7 @@ def apply_transfer_create_guild_ownership():
     """
     @notice Apply pending ownership transfer
     """
-    assert msg.sender == self.create_guild_admin  # dev: create guild admin only
+    assert msg.sender == self.admin  # dev: admin only
     _create_guild_admin: address = self.future_create_guild_admin
     assert _create_guild_admin != ZERO_ADDRESS  # dev: create guild admin not set
     self.create_guild_admin = _create_guild_admin
@@ -751,26 +751,25 @@ def remove_member(user_addr: address):
 @external
 def transfer_guild_ownership(new_owner: address):
     """
-    @notice Transfer ownership of Guild to `new_owner`
+    @notice Transfer ownership of Guild to `new_owner`, if new_owner is ZERO_ADDRESS, it will give up owner privilege and irreversible
     @param new_owner Address to have ownership transferred to
     """
-
     old_owner: address = msg.sender
-    assert new_owner != ZERO_ADDRESS # new owner must be a valid address
-    assert old_owner != new_owner # tx sender cannot transfer to himself
-    assert self.guild_owner_list[new_owner] == ZERO_ADDRESS, "New owner cannot be an owner of another guild"
-    
+    assert old_owner != new_owner # dev: tx sender cannot transfer to himself
     guild_addr: address = self.guild_owner_list[msg.sender]
     assert guild_addr != ZERO_ADDRESS, "Not an owner"
-    assert guild_addr == self.global_member_list[new_owner], "New owner is not in the same guild"
+    if new_owner != ZERO_ADDRESS:
+        assert self.guild_owner_list[new_owner] == ZERO_ADDRESS, "New owner cannot be an owner of another guild"
+        assert guild_addr == self.global_member_list[new_owner], "New owner is not in the same guild"
 
-    # Check if new owner fulfils create_guild requirements
-    weight: uint256 = VotingEscrow(self.voting_escrow).balanceOf(new_owner)
-    assert weight >= REQUIRED_CRITERIA * MULTIPLIER, "New owner does not meet requirement to take over guild"
+        # Check if new owner fulfils create_guild requirements
+        weight: uint256 = VotingEscrow(self.voting_escrow).balanceOf(new_owner)
+        assert weight >= REQUIRED_CRITERIA * MULTIPLIER, "New owner does not meet requirement to take over guild"
 
     Guild(guild_addr).transfer_ownership(new_owner)
     self.guild_owner_list[old_owner] = ZERO_ADDRESS
-    self.guild_owner_list[new_owner] = guild_addr
+    if new_owner != ZERO_ADDRESS:
+        self.guild_owner_list[new_owner] = guild_addr
     log TransferGuildOwnership(guild_addr, old_owner, new_owner)
     
 
@@ -798,4 +797,3 @@ def change_gas_escrow_contract(new_addr: address):
     old_addr: address = self.gas_escrow
     self.gas_escrow = new_addr
     log ChangeGasEscrowContract(old_addr, new_addr)
-
