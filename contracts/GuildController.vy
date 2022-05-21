@@ -110,7 +110,7 @@ MULTIPLIER: constant(uint256) = 10 ** 18
 admin: public(address)  # Can and will be a smart contract
 future_admin: public(address)  # Can and will be a smart contract
 
-create_guild_admin: public(address)  # Can and will be a smart contract
+create_guild_admin: public(HashMap[address, bool])  # Can and will be a smart contract
 future_create_guild_admin: public(address)  # Can and will be a smart contract
 
 token: public(address) # VRH token
@@ -171,7 +171,7 @@ def __init__(_token: address, _voting_escrow: address, _guild: address, _gas_esc
     assert _gas_escrow != ZERO_ADDRESS
 
     self.admin = msg.sender
-    self.create_guild_admin = msg.sender
+    self.create_guild_admin[msg.sender] = True
     self.token = _token
     self.voting_escrow = _voting_escrow
     self.guild = _guild
@@ -216,7 +216,7 @@ def commit_transfer_create_guild_ownership(addr: address):
     @notice Transfer ownership of GuildController to `addr`
     @param addr Address to have ownership transferred to
     """
-    assert msg.sender == self.admin  # dev: admin only
+    assert self.create_guild_admin[msg.sender] == True  # dev: admin only
     self.future_create_guild_admin = addr
     log CommitCreateGuildOwnership(addr)
 
@@ -226,10 +226,11 @@ def apply_transfer_create_guild_ownership():
     """
     @notice Apply pending ownership transfer
     """
-    assert msg.sender == self.admin  # dev: admin only
+    assert self.create_guild_admin[msg.sender] == True  # dev: admin only
     _create_guild_admin: address = self.future_create_guild_admin
     assert _create_guild_admin != ZERO_ADDRESS  # dev: create guild admin not set
-    self.create_guild_admin = _create_guild_admin
+    self.create_guild_admin[msg.sender] = False # set previous create guild admin to False
+    self.create_guild_admin[_create_guild_admin] = True # set new admin to True
     log ApplyCreateGuildOwnership(_create_guild_admin)
 
 
@@ -380,7 +381,7 @@ def create_guild(owner: address, guild_type: int128, commission_rate: uint256) -
     @param guild_type Guild type
     @param commission_rate Guild owner commission rate
     """
-    assert msg.sender == self.create_guild_admin
+    assert self.create_guild_admin[msg.sender] == True  
     assert (guild_type >= 0) and (guild_type < self.n_guild_types), "Guild type not supported"
     assert self.global_member_list[owner] == ZERO_ADDRESS, "Already in a guild"
     assert self.guild_owner_list[owner] == ZERO_ADDRESS, "Only can create one guild"
