@@ -15,12 +15,11 @@ TOL = 120 / WEEK
 
 @pytest.fixture(scope="module", autouse=True)
 def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_controller, minter, reward_vesting):
-    alice, bob, carl = accounts[:3]
+    alice, bob = accounts[:2]
     amount_alice = 110000 * 10 ** 18
     amount_bob = 110000 * 10 ** 18
     token.transfer(bob, amount_alice, {"from": alice})
     token.transfer(bob, amount_bob, {"from": alice})
-    token.transfer(carl, amount_bob, {"from": alice})
     stages = {}
 
     chain.sleep(DAY + 1)
@@ -28,7 +27,6 @@ def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_
 
     token.approve(voting_escrow.address, amount_alice * 10, {"from": alice})
     token.approve(voting_escrow.address, amount_bob * 10, {"from": bob})
-    token.approve(voting_escrow.address, amount_bob * 10, {"from": carl})
 
     assert voting_escrow.totalSupply() == 0
     assert voting_escrow.balanceOf(alice) == 0
@@ -44,7 +42,6 @@ def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_
 
     voting_escrow.create_lock(amount_alice, chain[-1].timestamp + MAXTIME, {"from": alice})
     voting_escrow.create_lock(amount_bob, chain[-1].timestamp + MAXTIME, {"from": bob})
-    voting_escrow.create_lock(amount_bob, chain[-1].timestamp + MAXTIME, {"from": carl})
     stages["alice_deposit"] = (web3.eth.block_number, chain[-1].timestamp)
 
     chain.sleep(H)
@@ -279,7 +276,7 @@ def test_transfer_ownership_then_leave_guild(chain, accounts, gas_token, guild_c
     2. no one to redeem owner_bonus.
     3. there will no longer be a new guild owner from there on.
     '''
-    alice, bob, carl = accounts[:3]
+    alice, bob = accounts[:2]
 
     # create 2 guild
     guild = create_guild(chain, guild_controller, gas_token, alice, Guild)
