@@ -4,6 +4,8 @@ import pytest
 from tests.conftest import approx
 from random import random, randrange
 
+from brownie import ZERO_ADDRESS
+
 H = 3600
 DAY = 86400
 WEEK = 7 * DAY
@@ -13,11 +15,12 @@ TOL = 120 / WEEK
 
 @pytest.fixture(scope="module", autouse=True)
 def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_controller, minter, reward_vesting):
-    alice, bob = accounts[:2]
+    alice, bob, carl = accounts[:3]
     amount_alice = 110000 * 10 ** 18
     amount_bob = 110000 * 10 ** 18
     token.transfer(bob, amount_alice, {"from": alice})
     token.transfer(bob, amount_bob, {"from": alice})
+    token.transfer(carl, amount_bob, {"from": alice})
     stages = {}
 
     chain.sleep(DAY + 1)
@@ -25,6 +28,7 @@ def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_
 
     token.approve(voting_escrow.address, amount_alice * 10, {"from": alice})
     token.approve(voting_escrow.address, amount_bob * 10, {"from": bob})
+    token.approve(voting_escrow.address, amount_bob * 10, {"from": carl})
 
     assert voting_escrow.totalSupply() == 0
     assert voting_escrow.balanceOf(alice) == 0
@@ -40,6 +44,7 @@ def initial_setup(web3, chain, accounts, token, gas_token, voting_escrow, guild_
 
     voting_escrow.create_lock(amount_alice, chain[-1].timestamp + MAXTIME, {"from": alice})
     voting_escrow.create_lock(amount_bob, chain[-1].timestamp + MAXTIME, {"from": bob})
+    voting_escrow.create_lock(amount_bob, chain[-1].timestamp + MAXTIME, {"from": carl})
     stages["alice_deposit"] = (web3.eth.block_number, chain[-1].timestamp)
 
     chain.sleep(H)
@@ -267,6 +272,50 @@ def test_transfer_ownership(chain, accounts, gas_token, guild_controller, Guild)
     # check guild controller global owner list is bob
     assert guild.address == guild_controller.guild_owner_list(bob)
 
+def test_transfer_ownership_then_leave_guild(chain, accounts, gas_token, guild_controller, Guild):
+    '''
+    test guild owner to degrade itself to just another member then leave guild, resulting in:
+    1. commision rate to be fixed.
+    2. no one to redeem owner_bonus.
+    3. there will no longer be a new guild owner from there on.
+    '''
+    alice, bob, carl = accounts[:3]
+
+    # create 2 guild
+    guild = create_guild(chain, guild_controller, gas_token, alice, Guild)
+
+    chain.sleep(WEEK + 1)
+    chain.mine()
+    # check guild controller global owner list is alice
+    assert guild.address == guild_controller.guild_owner_list(alice)
+    with brownie.reverts("New owner is not in the same guild"):
+        guild_controller.transfer_guild_ownership(bob, {"from": alice})
+    # bob join guild as a member
+    guild.join_guild({"from": bob})
+    # transfer ownership to bob
+    guild_controller.transfer_guild_ownership(bob, {"from": alice})
+    # check guild controller global owner list is bob
+    assert guild.address == guild_controller.guild_owner_list(bob)
+
+    chain.sleep(WEEK * 2)
+    chain.mine()
+    
+    guild_controller.transfer_guild_ownership(ZERO_ADDRESS, {"from": bob})
+
+    assert guild.address in guild_controller.guild_owner_list(ZERO_ADDRESS)
+
+    with brownie.reverts("Only guild owner can change commission rate"):
+        guild.set_commission_rate(False, {"from": bob})
+
+    # guild previous owner leave guild
+    guild.leave_guild({"from": bob})
+
+    # carl join guild as a member
+    guild.join_guild({"from": carl})
+
+    # transfer ownership to carl will fail because zero address is not valid.
+    with brownie.reverts("The nonce generation function failed, or the private key was invalid"):
+        guild_controller.transfer_guild_ownership(carl, {"from": ZERO_ADDRESS})
 
 def test_owner_leave_guild(chain, accounts, gas_token, guild_controller, Guild):
     alice = accounts[0]

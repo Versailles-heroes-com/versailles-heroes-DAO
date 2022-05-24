@@ -756,18 +756,20 @@ def transfer_guild_ownership(new_owner: address):
     """
 
     old_owner: address = msg.sender
-    assert new_owner != ZERO_ADDRESS # new owner must be a valid address
     assert old_owner != new_owner # tx sender cannot transfer to himself
-    assert self.guild_owner_list[new_owner] == ZERO_ADDRESS, "New owner cannot be an owner of another guild"
+    
+    if new_owner != ZERO_ADDRESS:
+        assert self.guild_owner_list[new_owner] == ZERO_ADDRESS, "New owner cannot be an owner of another guild"
     
     guild_addr: address = self.guild_owner_list[msg.sender]
     assert guild_addr != ZERO_ADDRESS, "Not an owner"
-    assert guild_addr == self.global_member_list[new_owner], "New owner is not in the same guild"
-
-    # Check if new owner fulfils create_guild requirements
-    weight: uint256 = VotingEscrow(self.voting_escrow).balanceOf(new_owner)
-    assert weight >= REQUIRED_CRITERIA * MULTIPLIER, "New owner does not meet requirement to take over guild"
-
+    
+    if new_owner != ZERO_ADDRESS:
+        assert guild_addr == self.global_member_list[new_owner], "New owner is not in the same guild"
+        # Check if new owner fulfils create_guild requirements
+        weight: uint256 = VotingEscrow(self.voting_escrow).balanceOf(new_owner)
+        assert weight >= REQUIRED_CRITERIA * MULTIPLIER, "New owner does not meet requirement to take over guild"
+        
     Guild(guild_addr).transfer_ownership(new_owner)
     self.guild_owner_list[old_owner] = ZERO_ADDRESS
     self.guild_owner_list[new_owner] = guild_addr
