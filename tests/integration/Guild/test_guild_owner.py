@@ -310,13 +310,6 @@ def test_transfer_ownership_then_leave_guild(chain, accounts, gas_token, guild_c
     # guild previous owner leave guild
     guild.leave_guild({"from": bob})
 
-    # carl join guild as a member
-    guild.join_guild({"from": carl})
-
-    # transfer ownership to carl will fail because zero address is not valid.
-    with brownie.reverts("The nonce generation function failed, or the private key was invalid"):
-        guild_controller.transfer_guild_ownership(carl, {"from": ZERO_ADDRESS})
-
 def test_owner_leave_guild(chain, accounts, gas_token, guild_controller, Guild):
     alice = accounts[0]
     guild = create_guild(chain, guild_controller, gas_token, alice, Guild)
