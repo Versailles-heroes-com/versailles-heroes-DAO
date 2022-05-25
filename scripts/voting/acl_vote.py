@@ -13,60 +13,31 @@ warnings.filterwarnings("ignore")
 # addresses related to the DAO - these should not need modification
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
-VRH_DAO_OWNERSHIP = {
-    "agent": "0x60db471e3c4D875d03ea1A2774B3FbAba97aF67c",
-    "voting": "0x7B86480fe5169197cB697363363Cbda4C7058e26",
+TARGET = {
+    "agent": "0x60db471e3c4d875d03ea1a2774b3fbaba97af67c",
+    "voting": "0x7b86480fe5169197cb697363363cbda4c7058e26",
     "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
     "quorum": 30,
 }
 
-VRH_DAO_CREATE_GUILD = {
-    "agent": "0xA8816C06aDF6658b5aed90cB46CFBbe1521473e2",
-    "voting": "0xdfC7A15b7f8d951f9842Ed3D116C4586c0791B87",
-    "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
-    "quorum": 15,
-}
-
-EMERGENCY_DAO = {
-    "forwarder": "0xE5E94f76Cb6c7F250780319a786eCf94D8ccF2E6",
-    "agent": "0x72f50a9016878e4ce837d5314355647484dc2d83",
-    "voting": "0xb18811c42adb9fe8048c4912d137640ab3c79131",
-    "token": "0xe8dbd31b8ce6e69c6d78cfba67678faf21e09550",
-    "quorum": 51,
-}
-
-# the intended target of the vote, should be one of the above constant dicts
-TARGET = VRH_DAO_OWNERSHIP
-
 # address to create the vote from - you will need to modify this prior to mainnet use
 accounts.add(config['wallets']['from_keys'])
-#SENDER = accounts.at("0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", force=True)
 SENDER = accounts[0]
-
-# a list of calls to perform in the vote, formatted as a lsit of tuples
-# in the format (target, function name, *input args).
-#
-# for example, to call:
-# GaugeController("0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB").add_gauge("0xFA712...", 0, 0)
-#
-# use the following:
-# [("0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB", "add_gauge", "0xFA712...", 0, 0),]
-#
-# commonly used addresses:
-# GuildController - 0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB
-# Guild - 0x519AFB566c05E00cfB9af73496D00217A630e4D5
-# GasEscrow - 0xeCb456EA5365865EbAb8a2661B0c503410e9B347
 
 guildType = 0
 guildRate = 20
 ACTIONS = [
-    # ("target", "fn_name", *args),
-    #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "name")
-    #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
-    #("guild_controller", "0x33DeFdCbe3056b98c90dF05369e6A4b3281445E5", "create_guild", accounts[0], guildType, guildRate)
-    #("aragon-acl", "0xBe9519fa1e90120f5713FA32AbAAFbaB8F93AEC7", "grantPermission", "0x7b86480fe5169197cb697363363cbda4c7058e26", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "e7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0")
-    #("aragon-acl", "0xBe9519fa1e90120f5713FA32AbAAFbaB8F93AEC7", "setPermissionManager", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", "0xdfC7A15b7f8d951f9842Ed3D116C4586c0791B87", "e7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0")
-    ("aragon-ownership-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
+    # ("name", "target", "fn_name", *args),
+    ### grantPermission(address _entity, address _app, bytes32 _role, {'from': Account})
+    ("aragon-acl", "0xbe9519fa1e90120f5713fa32abaafbab8f93aec7", "grantPermission", "0x7b86480fe5169197cb697363363cbda4c7058e26", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650")
+
+    ### createPermission(address _entity, address _app, bytes32 _role, address _manager, {'from': Account})
+    #("aragon-acl", "0xbe9519fa1e90120f5713fa32abaafbab8f93aec7", "createPermission", "0x7b86480fe5169197cb697363363cbda4c7058e26", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39", "0x7b86480fe5169197cb697363363cbda4c7058e26")
+    ### revokePermission(address _entity, address _app, bytes32 _role, {'from': Account})
+    #("aragon-acl", "0xbe9519fa1e90120f5713fa32abaafbab8f93aec7", "revokePermission", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39")
+    
+    ### setPermissionManager(address _newManager, address _app, bytes32 _role, {'from': Account})
+    #("aragon-acl", "0xbe9519fa1e90120f5713fa32abaafbab8f93aec7", "setPermissionManager", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39")
 ]
 
 # description of the vote, will be pinned to IPFS
@@ -78,20 +49,17 @@ def get_abi(name):
     return aragon_abi
 
 def prepare_evm_script():
-    # agent = Contract.from_explorer(TARGET["agent"])
-    aragon_abi = get_abi("aragon-agent")
-    agent = Contract.from_abi("agent", TARGET["agent"], aragon_abi)
     evm_script = "0x00000001"
 
     for name, address, fn_name, *args in ACTIONS:
         abi_info = get_abi(name)
         contract = Contract.from_abi(name, address, abi_info)
         fn = getattr(contract, fn_name)
-        calldata = fn.encode_input(*args)
-        agent_calldata = agent.execute.encode_input(address, 0, calldata)[2:]
-        length = hex(len(agent_calldata) // 2)[2:].zfill(8)
-        evm_script = f"{evm_script}{agent.address[2:]}{length}{agent_calldata}"
+        calldata = fn.encode_input(*args)[2:]
+        length = hex(len(calldata) // 2)[2:].zfill(8)
+        evm_script = f"{evm_script}{contract.address[2:]}{length}{calldata}"
 
+    print(evm_script)
     return evm_script
 
 
@@ -111,7 +79,6 @@ def make_vote(sender=SENDER):
     #aragon = Contract(TARGET["voting"])
     evm_script = prepare_evm_script()
     print("vote numbers: %s", aragon.votesLength())
-    # evm_script = '0x0000000140907540d8a6C65c637785e8f8B742ae6b0b996800000104b61d27f60000000000000000000000002f50d538606fa9edd2b11e2446beb18c9d5846bb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000006418dfe92100000000000000000000000069fb7c45726cfe2badee8317005d3f94be8388400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
     if TARGET.get("forwarder"):
         # the emergency DAO only allows new votes via a forwarder contract
         # so we have to wrap the call in another layer of evm script

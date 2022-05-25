@@ -13,16 +13,16 @@ warnings.filterwarnings("ignore")
 # addresses related to the DAO - these should not need modification
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
-VRH_DAO_GUILD = {
+VRH_DAO_OWNERSHIP = {
     "agent": "0x0cEE0478de7dF4b97f2a42093b1F6B37971A4d93",
     "voting": "0xC2D3e2817023558100bbf714e82487aBe0C00e09",
     "token": "0x1e562884ad4EC14b9Ee7461F964c6f2205Bc2b71",
     "quorum": 30,
 }
 
-VRH_DAO_PARAM = {
-    "agent": "0xbD99a0164f216e456623486d1192A31d422D078C",
-    "voting": "0xE790e4ae566C14e5850f15f8CA644e86C0Eb97c0",
+VRH_DAO_CREATE_GUILD = {
+    "agent": "0x54bdac1c762406a1aea63a31079ea45ee15e6bb9",
+    "voting": "0xCd6D0863184C008e893bE0696232e6641Be65c0E",
     "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
     "quorum": 15,
 }
@@ -36,7 +36,7 @@ EMERGENCY_DAO = {
 }
 
 # the intended target of the vote, should be one of the above constant dicts
-TARGET = VRH_DAO_GUILD
+TARGET = VRH_DAO_CREATE_GUILD
 
 # address to create the vote from - you will need to modify this prior to mainnet use
 accounts.add(config['wallets']['from_keys'])
@@ -62,8 +62,8 @@ guildRate = 20
 ACTIONS = [
     # ("target", "fn_name", *args),
     #("voting_escrow", "0xAf27eb7B9157dBd90ec63E55d5381d1301b8E6b2", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
-    ("guild_controller", "0x12304CAECD8090DCB35802f47B2d5b9D50410bDE", "create_guild", accounts[0], guildType, guildRate)
-    #("guild_voting", "0xC2D3e2817023558100bbf714e82487aBe0C00e09", "setMinGuildBalance", 900000000000000000000000)
+    #("guild_controller", "0x12304CAECD8090DCB35802f47B2d5b9D50410bDE", "create_guild", accounts[0], guildType, guildRate)
+    ("aragon-create-guild-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
 ]
 
 # description of the vote, will be pinned to IPFS
@@ -155,6 +155,6 @@ def simulate():
 
 
 def main():
-    print("accounts: %s %s %s", SENDER.address, SENDER.balance(), SENDER.private_key)
+    print("accounts: ", SENDER.address, SENDER.balance(), SENDER.private_key)
     vote_id = make_vote(sender=SENDER)
     print("please vote id: %s" % vote_id)

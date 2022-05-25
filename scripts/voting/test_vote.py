@@ -13,34 +13,17 @@ warnings.filterwarnings("ignore")
 # addresses related to the DAO - these should not need modification
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
-VRH_DAO_OWNERSHIP = {
-    "agent": "0x60db471e3c4D875d03ea1A2774B3FbAba97aF67c",
-    "voting": "0x7B86480fe5169197cB697363363Cbda4C7058e26",
+TARGET = {
+    #"forwarder": "0x8ea2cdaa10531b98ab2b4d122b9f3801663c35ec",
+    "agent": "0x8f0d638c884f3d743bce0bb63ad5cfdc2159d340",
+    "voting": "0xb18811c42adb9fe8048c4912d137640ab3c79131",
     "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
     "quorum": 30,
 }
 
-VRH_DAO_CREATE_GUILD = {
-    "agent": "0xA8816C06aDF6658b5aed90cB46CFBbe1521473e2",
-    "voting": "0xdfC7A15b7f8d951f9842Ed3D116C4586c0791B87",
-    "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
-    "quorum": 15,
-}
-
-EMERGENCY_DAO = {
-    "forwarder": "0xE5E94f76Cb6c7F250780319a786eCf94D8ccF2E6",
-    "agent": "0x72f50a9016878e4ce837d5314355647484dc2d83",
-    "voting": "0xb18811c42adb9fe8048c4912d137640ab3c79131",
-    "token": "0xe8dbd31b8ce6e69c6d78cfba67678faf21e09550",
-    "quorum": 51,
-}
-
-# the intended target of the vote, should be one of the above constant dicts
-TARGET = VRH_DAO_OWNERSHIP
-
 # address to create the vote from - you will need to modify this prior to mainnet use
-accounts.add(config['wallets']['from_keys'])
-#SENDER = accounts.at("0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", force=True)
+#accounts.add(config['wallets']['from_keys'])
+accounts.add('0xce8a45f212b737683743264b05e20ae57595c7c299c77155e8ffe70b9b4ed991')
 SENDER = accounts[0]
 
 # a list of calls to perform in the vote, formatted as a lsit of tuples
@@ -64,9 +47,12 @@ ACTIONS = [
     #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "name")
     #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
     #("guild_controller", "0x33DeFdCbe3056b98c90dF05369e6A4b3281445E5", "create_guild", accounts[0], guildType, guildRate)
-    #("aragon-acl", "0xBe9519fa1e90120f5713FA32AbAAFbaB8F93AEC7", "grantPermission", "0x7b86480fe5169197cb697363363cbda4c7058e26", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "e7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0")
+    #("aragon-acl", "0x8ea2cdaa10531b98ab2b4d122b9f3801663c35ec", "grantPermission", "0x17680a1a2a14dd50184db35aab322cc23814998e", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", "0xda3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650")
     #("aragon-acl", "0xBe9519fa1e90120f5713FA32AbAAFbaB8F93AEC7", "setPermissionManager", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", "0xdfC7A15b7f8d951f9842Ed3D116C4586c0791B87", "e7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0")
-    ("aragon-ownership-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
+    #("aragon-acl", "0x8ea2cdaa10531b98ab2b4d122b9f3801663c35ec", "grantPermission", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", '0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1', '0xe7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0')
+    #("aragon-ownership-voting", "0xc087ee91b7f993ba36f2a82b0dae8e32169cedd4", "MODIFY_QUORUM_ROLE", '0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1')
+
+    ("aragon-acl", "0xdd16b55d2db5c25a3e27cb5263d91d66efb64aa7", "grantPermission", "0xb18811c42adb9fe8048c4912d137640ab3c79131", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", "ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39")
 ]
 
 # description of the vote, will be pinned to IPFS
@@ -110,8 +96,8 @@ def make_vote(sender=SENDER):
         aragon = proxy
     #aragon = Contract(TARGET["voting"])
     evm_script = prepare_evm_script()
+    #evm_script = '0x000000018ea2cdaa10531b98ab2b4d122b9f3801663c35ec000000640a8ed3db00000000000000000000000017680a1a2a14dd50184db35aab322cc23814998e0000000000000000000000007155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39'
     print("vote numbers: %s", aragon.votesLength())
-    # evm_script = '0x0000000140907540d8a6C65c637785e8f8B742ae6b0b996800000104b61d27f60000000000000000000000002f50d538606fa9edd2b11e2446beb18c9d5846bb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000006418dfe92100000000000000000000000069fb7c45726cfe2badee8317005d3f94be8388400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
     if TARGET.get("forwarder"):
         # the emergency DAO only allows new votes via a forwarder contract
         # so we have to wrap the call in another layer of evm script
