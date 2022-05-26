@@ -12,7 +12,8 @@ def live():
 
     transfer_ownership(
         admin,
-        config.ARAGON_AGENT,
+        config.OWNERSHI_AGENT,
+        config.CREATEGUILD_AGENT,
         deployments["GuildController"],
         deployments["VotingEscrow"],
         deployments["RewardVestingEscrow"],
@@ -29,7 +30,8 @@ def development():
 
     transfer_ownership(
         admin,
-        config.ARAGON_AGENT,
+        config.OWNERSHI_AGENT,
+        config.CREATEGUILD_AGENT,
         deployments["GuildController"],
         deployments["VotingEscrow"],
         deployments["RewardVestingEscrow"],
@@ -38,7 +40,7 @@ def development():
 
 
 def transfer_ownership(
-    admin, new_admin, guild_controller, voting_escrow, vesting, erc20vrh, confs=1
+    admin, new_admin, create_guild_admin, guild_controller, voting_escrow, vesting, erc20vrh, confs=1
 ):
     guild_controller = GuildController.at(guild_controller)
     voting_escrow = VotingEscrow.at(voting_escrow)
@@ -46,6 +48,9 @@ def transfer_ownership(
 
     guild_controller.commit_transfer_ownership(new_admin, {"from": admin, "required_confs": confs})
     guild_controller.apply_transfer_ownership({"from": admin, "required_confs": confs})
+
+    guild_controller.commit_transfer_create_guild_ownership(create_guild_admin, {"from": admin, "required_confs": confs})
+    guild_controller.apply_transfer_create_guild_ownership({"from": admin, "required_confs": confs})
 
     voting_escrow.commit_transfer_ownership(new_admin, {"from": admin, "required_confs": confs})
     voting_escrow.apply_transfer_ownership({"from": admin, "required_confs": confs})

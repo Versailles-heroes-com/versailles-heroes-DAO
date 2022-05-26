@@ -90,6 +90,7 @@ def deploy_part_two(admin, token, voting_escrow, gas_escrow_template, guild_temp
     vesting = RewardVestingEscrow.deploy({"from": admin, "required_confs": confs})
     minter = Minter.deploy(token, guild_controller, vesting, {"from": admin, "required_confs": confs})
     token.set_minter(minter, {"from": admin, "required_confs": confs})
+    vesting.set_minter(minter, {"from": admin, "required_confs": confs})
 
     deployments = {
         "ERC20VRH": token.address,

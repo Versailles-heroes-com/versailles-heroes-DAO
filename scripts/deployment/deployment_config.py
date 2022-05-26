@@ -18,6 +18,35 @@ ARAGON_AGENT = None
 
 YEAR = 86400 * 365
 
+# `VestingEscrow` contracts to be deployed
+STANDARD_ESCROWS = [
+    {  # Core team vesting
+        "duration": 30 * YEAR,
+        "can_disable": False,
+        "admin": "0x000000000000000000000000000000000000dead",
+        "recipients": {
+            "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": 242400000_000000000000000000,
+        },
+    },
+    {  # Investors
+        "duration": 35 * YEAR,
+        "can_disable": False,
+        "admin": "0x000000000000000000000000000000000000dead",
+        "recipients": {
+            "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": 169680000_000000000000000000,
+        },
+    },
+    {  # Foundation
+        "duration": 35 * YEAR,
+        "can_disable": False,
+        "admin": "0xhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",  # versailles
+        "recipients": {
+            "0xcccccccccccccccccccccccccccccccccccccccc": 169680000_000000000000000000,
+        },
+    },
+]
+
+
 def get_live_admin():
     # Admin and funding admin account objects used for in a live environment
     # May be created via accounts.load(name) or accounts.add(privkey)

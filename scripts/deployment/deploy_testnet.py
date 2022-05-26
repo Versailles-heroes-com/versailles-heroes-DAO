@@ -156,6 +156,7 @@ def main():
     # setting minter
     repeat(token.set_minter, minter, {"from": deployer, "required_confs": CONFS})
     repeat(guild_controller.set_minter, minter, {"from": deployer, "required_confs": CONFS})
+    repeat(vesting.set_minter, minter, {"from": deployer, "required_confs": CONFS})
 
     # add type
     repeat(guild_controller.add_type, GUILD_TYPES[0][0], GUILD_TYPES[0][1], gas_token, GUILD_TYPES[0][2], {"from": deployer, "required_confs": CONFS})
