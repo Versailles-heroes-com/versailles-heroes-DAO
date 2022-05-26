@@ -14,8 +14,8 @@ warnings.filterwarnings("ignore")
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
 VRH_DAO_OWNERSHIP = {
-    "agent": "0x0cEE0478de7dF4b97f2a42093b1F6B37971A4d93",
-    "voting": "0xC2D3e2817023558100bbf714e82487aBe0C00e09",
+    "agent": "0x84F69d0fa6b13bFFB95300462FDd98B7c487D917",
+    "voting": "0x1a0b896824fb45983c9bc6183795d9c89682f446",
     "token": "0x1e562884ad4EC14b9Ee7461F964c6f2205Bc2b71",
     "quorum": 30,
 }
@@ -40,7 +40,6 @@ TARGET = VRH_DAO_CREATE_GUILD
 
 # address to create the vote from - you will need to modify this prior to mainnet use
 accounts.add(config['wallets']['from_keys'])
-#SENDER = accounts.at("0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", force=True)
 SENDER = accounts[0]
 
 # a list of calls to perform in the vote, formatted as a lsit of tuples
@@ -62,8 +61,8 @@ guildRate = 20
 ACTIONS = [
     # ("target", "fn_name", *args),
     #("voting_escrow", "0xAf27eb7B9157dBd90ec63E55d5381d1301b8E6b2", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
-    #("guild_controller", "0x12304CAECD8090DCB35802f47B2d5b9D50410bDE", "create_guild", accounts[0], guildType, guildRate)
-    ("aragon-create-guild-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
+    ("guild_controller", "0x33defdcbe3056b98c90df05369e6a4b3281445e5", "create_guild", accounts[0], guildType, guildRate)
+    #("aragon-create-guild-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
 ]
 
 # description of the vote, will be pinned to IPFS
