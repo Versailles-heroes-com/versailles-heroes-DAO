@@ -6,41 +6,17 @@ from brownie import Contract, accounts, chain, config
 
 warnings.filterwarnings("ignore")
 
-# this script is used to prepare, simulate and broadcast votes within Versailles's DAO
-# modify the constants below according the the comments, and then use `simulate` in
-# a forked mainnet to verify the result of the vote prior to broadcasting on mainnet
-
-# addresses related to the DAO - these should not need modification
-# as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
-# as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
-VRH_DAO_OWNERSHIP = {
-    "agent": "0x84F69d0fa6b13bFFB95300462FDd98B7c487D917",
-    "voting": "0x1a0b896824fb45983c9bc6183795d9c89682f446",
-    "token": "0x1e562884ad4EC14b9Ee7461F964c6f2205Bc2b71",
-    "quorum": 30,
-}
-
-VRH_DAO_CREATE_GUILD = {
-    "agent": "0x54bdac1c762406a1aea63a31079ea45ee15e6bb9",
-    "voting": "0xCd6D0863184C008e893bE0696232e6641Be65c0E",
-    "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
+TARGET = {
+    "agent": "0x9FAB5EfE2CAcc37a9a6da212987936B741428dAA",
+    "voting": "0x30A3c983bA81b8481ec48978babb78948Bb5e4f0",
+    "token": "0xC858DB925e96B1dc4Fb3Af2e9AD215d16D9C4057",
     "quorum": 15,
 }
-
-EMERGENCY_DAO = {
-    "forwarder": "0xE5E94f76Cb6c7F250780319a786eCf94D8ccF2E6",
-    "agent": "0x72f50a9016878e4ce837d5314355647484dc2d83",
-    "voting": "0xb18811c42adb9fe8048c4912d137640ab3c79131",
-    "token": "0xe8dbd31b8ce6e69c6d78cfba67678faf21e09550",
-    "quorum": 51,
-}
-
-# the intended target of the vote, should be one of the above constant dicts
-TARGET = VRH_DAO_CREATE_GUILD
 
 # address to create the vote from - you will need to modify this prior to mainnet use
 accounts.add(config['wallets']['from_keys'])
 SENDER = accounts[0]
+create_guild_account = ''
 
 # a list of calls to perform in the vote, formatted as a lsit of tuples
 # in the format (target, function name, *input args).
@@ -60,9 +36,7 @@ guildType = 0
 guildRate = 20
 ACTIONS = [
     # ("target", "fn_name", *args),
-    #("voting_escrow", "0xAf27eb7B9157dBd90ec63E55d5381d1301b8E6b2", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
-    ("guild_controller", "0x33defdcbe3056b98c90df05369e6a4b3281445e5", "create_guild", accounts[0], guildType, guildRate)
-    #("aragon-create-guild-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
+    ("guild_controller", "0x360f9C1FDAee0273a60F057f208BcBe253F0244f", "create_guild", create_guild_account, guildType, guildRate)
 ]
 
 # description of the vote, will be pinned to IPFS

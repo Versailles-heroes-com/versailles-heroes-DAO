@@ -46,11 +46,11 @@ def transfer_ownership(
     voting_escrow = VotingEscrow.at(voting_escrow)
     erc20vrh = ERC20VRH.at(erc20vrh)
 
-    guild_controller.commit_transfer_ownership(new_admin, {"from": admin, "required_confs": confs})
-    guild_controller.apply_transfer_ownership({"from": admin, "required_confs": confs})
-
     guild_controller.commit_transfer_create_guild_ownership(create_guild_admin, {"from": admin, "required_confs": confs})
     guild_controller.apply_transfer_create_guild_ownership({"from": admin, "required_confs": confs})
+
+    guild_controller.commit_transfer_ownership(new_admin, {"from": admin, "required_confs": confs})
+    guild_controller.apply_transfer_ownership({"from": admin, "required_confs": confs})
 
     voting_escrow.commit_transfer_ownership(new_admin, {"from": admin, "required_confs": confs})
     voting_escrow.apply_transfer_ownership({"from": admin, "required_confs": confs})

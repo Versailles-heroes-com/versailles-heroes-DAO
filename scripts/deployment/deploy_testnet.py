@@ -39,10 +39,11 @@ GUILD_TYPES = [
 
 if network.show_active() != "development":
     DEPLOYER = config['paramers']['deployer']
-    funding_admins = config['paramers']['funding_admins'].split(',')
+    #funding_admins = config['paramers']['funding_admins'].split(',')
 else:
-    DEPLOYER = accounts[1]
-    funding_admins = accounts[1:5]
+    DEPLOYER = accounts[0]
+    #funding_admins = accounts[1:5]
+    #funding_admins = accounts[1:5]
 
 def repeat(f, *args):
     """
@@ -110,10 +111,16 @@ def main():
         GasEscrow.deploy,
         {"from": deployer, "required_confs": CONFS}
     )
+    if SaveAbi:
+        save_abi(gas_escrow_template, "gas_escrow_template")
+
     guild_template = repeat(
         Guild.deploy,
         {"from": deployer, "required_confs": CONFS}
     )
+    if SaveAbi:
+        save_abi(guild_template, "guild_template")
+
     guild_controller = repeat(
         GuildController.deploy,
         token,

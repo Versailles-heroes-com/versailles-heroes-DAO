@@ -14,16 +14,16 @@ warnings.filterwarnings("ignore")
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
 VRH_DAO_OWNERSHIP = {
-    "agent": "0x60db471e3c4D875d03ea1A2774B3FbAba97aF67c",
-    "voting": "0x7B86480fe5169197cB697363363Cbda4C7058e26",
-    "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
+    "agent": "0xA2D7fFaf8cd6C67e41E5372Be54260fe6591B3Ee",
+    "voting": "0xd4Da2E403bb4E155B46bd26508b8F51014F1dD09",
+    "token": "0xC858DB925e96B1dc4Fb3Af2e9AD215d16D9C4057",
     "quorum": 30,
 }
 
 VRH_DAO_CREATE_GUILD = {
-    "agent": "0xA8816C06aDF6658b5aed90cB46CFBbe1521473e2",
-    "voting": "0xdfC7A15b7f8d951f9842Ed3D116C4586c0791B87",
-    "token": "0xfbF37F43d82E1240c11A2065C606bd414d07B888",
+    "agent": "0x9FAB5EfE2CAcc37a9a6da212987936B741428dAA",
+    "voting": "0x30A3c983bA81b8481ec48978babb78948Bb5e4f0",
+    "token": "0xC858DB925e96B1dc4Fb3Af2e9AD215d16D9C4057",
     "quorum": 15,
 }
 
@@ -63,10 +63,8 @@ ACTIONS = [
     # ("target", "fn_name", *args),
     #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "name")
     #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
-    #("guild_controller", "0x33DeFdCbe3056b98c90dF05369e6A4b3281445E5", "create_guild", accounts[0], guildType, guildRate)
-    #("aragon-acl", "0xBe9519fa1e90120f5713FA32AbAAFbaB8F93AEC7", "grantPermission", "0x7b86480fe5169197cb697363363cbda4c7058e26", "0xdfc7a15b7f8d951f9842ed3d116c4586c0791b87", "e7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0")
-    #("aragon-acl", "0xBe9519fa1e90120f5713FA32AbAAFbaB8F93AEC7", "setPermissionManager", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1", "0xdfC7A15b7f8d951f9842Ed3D116C4586c0791B87", "e7ab0252519cd959720b328191bed7fe61b8e25f77613877be7070646d12daf0")
-    ("aragon-ownership-voting", "0xCd6D0863184C008e893bE0696232e6641Be65c0E", "changeMinAcceptQuorumPct", 600000000000000000)
+    #("guild_controller", "0x360f9C1FDAee0273a60F057f208BcBe253F0244f", "commit_transfer_create_guild_ownership", '0x9FAB5EfE2CAcc37a9a6da212987936B741428dAA')
+    ("guild_controller", "0x360f9C1FDAee0273a60F057f208BcBe253F0244f", "apply_transfer_create_guild_ownership")
 ]
 
 # description of the vote, will be pinned to IPFS
@@ -111,7 +109,6 @@ def make_vote(sender=SENDER):
     #aragon = Contract(TARGET["voting"])
     evm_script = prepare_evm_script()
     print("vote numbers: %s", aragon.votesLength())
-    # evm_script = '0x0000000140907540d8a6C65c637785e8f8B742ae6b0b996800000104b61d27f60000000000000000000000002f50d538606fa9edd2b11e2446beb18c9d5846bb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000006418dfe92100000000000000000000000069fb7c45726cfe2badee8317005d3f94be8388400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
     if TARGET.get("forwarder"):
         # the emergency DAO only allows new votes via a forwarder contract
         # so we have to wrap the call in another layer of evm script
