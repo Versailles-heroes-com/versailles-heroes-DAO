@@ -11,8 +11,8 @@ VOTE_ID = 0
 # address of the contract where the vote was created
 # ownership votes: 0x1A0B896824fB45983c9bC6183795D9c89682F446
 # parameter votes: 0xbcff8b0b9419b9a88c44546519b1e909cf330399
-#VOTING_ADDRESS = "0x1A0B896824fB45983c9bC6183795D9c89682F446"
-VOTING_ADDRESS = "0xb18811c42adb9fe8048c4912d137640ab3c79131"
+#VOTING_ADDRESS = "0xa6AaF7Ea9ed211068Edfe89C6eCADA0baeF7Bcf6"
+VOTING_ADDRESS = "0xD3cA8c18D3E594701392DEF683200EA09dB6deEf"
 
 
 def main(vote_id=VOTE_ID):
@@ -34,15 +34,15 @@ def main(vote_id=VOTE_ID):
     print()
     script = HexBytes(evm_script['script'])
     #script = HexBytes('0x00000001dd16b55d2db5c25a3e27cb5263d91d66efb64aa7000000640a8ed3db000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39')
-    script = HexBytes('0x00000001dd16b55d2db5c25a3e27cb5263d91d66efb64aa700000064afd925df000000000000000000000000e5e94f76cb6c7f250780319a786ecf94d8ccf2e6000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131da3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650')
-    script = HexBytes('0x00000001dd16b55d2db5c25a3e27cb5263d91d66efb64aa7000000640a8ed3db000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39')
-    
+    #script = HexBytes('0x00000001dd16b55d2db5c25a3e27cb5263d91d66efb64aa700000064afd925df000000000000000000000000e5e94f76cb6c7f250780319a786ecf94d8ccf2e6000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131da3972983e62bdf826c4b807c4c9c2b8a941e1f83dfa76d53d6aeac11e1be650')
+    #script = HexBytes('0x00000001dd16b55d2db5c25a3e27cb5263d91d66efb64aa7000000640a8ed3db000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131000000000000000000000000b18811c42adb9fe8048c4912d137640ab3c79131ad15e7261800b4bb73f1b69d3864565ffb1fd00cb93cf14fe48da8f1f2149f39')
+
     idx = 4
     while idx < len(script):
         #target = Contract.from_explorer(script[idx : idx + 20])
         #if hasattr(target, 'implementation'):
         #    target = Contract.from_explorer(script[idx : idx + 20], as_proxy_for=target.implementation())
-        
+
         print("decode contract: ", script[idx : idx + 20])
         target = Contract(script[idx : idx + 20])
         idx += 20

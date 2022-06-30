@@ -14,7 +14,7 @@ from brownie import (
     history,
 )
 
-from . import deployment_config as config
+from . import deployment_config
 
 # TODO set weights!
 
@@ -26,13 +26,13 @@ GUILD_TYPES = [
 
 
 def live_part_one():
-    admin, _ = config.get_live_admin()
-    deploy_part_one(admin, config.REQUIRED_CONFIRMATIONS, config.DEPLOYMENTS_JSON)
+    admin, _ = deployment_config.get_live_admin()
+    deploy_part_one(admin, deployment_config.REQUIRED_CONFIRMATIONS, deployment_config.DEPLOYMENTS_JSON)
 
 
 def live_part_two():
-    admin, _ = config.get_live_admin()
-    with open(config.DEPLOYMENTS_JSON) as fp:
+    admin, _ = deployment_config.get_live_admin()
+    with open(deployment_config.DEPLOYMENTS_JSON) as fp:
         deployments = json.load(fp)
     token = ERC20VRH.at(deployments["ERC20VRH"])
     voting_escrow = VotingEscrow.at(deployments["VotingEscrow"])
@@ -40,7 +40,7 @@ def live_part_two():
     guild_template = Guild.at(deployments["GuildTemplate"])
 
     deploy_part_two(
-        admin, token, voting_escrow, gas_escrow_template, guild_template, config.REQUIRED_CONFIRMATIONS, config.DEPLOYMENTS_JSON
+        admin, token, voting_escrow, gas_escrow_template, guild_template, deployment_config.REQUIRED_CONFIRMATIONS, deployment_config.DEPLOYMENTS_JSON
     )
 
 
@@ -49,8 +49,15 @@ def development():
     deploy_part_two(accounts[0], token, voting_escrow, gas_escrow_template, guild_template)
 
 
-def deploy_part_one(admin, confs=1, deployments_json=None):
-    token = ERC20VRH.deploy("Vote Escrowed Token", "VRH", 18, {"from": admin, "required_confs": confs})
+def deploy_part_one(admin, confs=1, deployments_json="deployments.json"):
+    accounts.add(config['wallets']['from_keys'])
+    admin = accounts.at(admin)
+    print("admin: ", admin)
+
+    print('\ndeploy token.')
+    token = ERC20VRH.deploy("Versailles Heroes Token", "VRH", 18, {"from": admin, "required_confs": confs})
+
+    print('deploy voting_escrow.')
     voting_escrow = VotingEscrow.deploy(
         token,
         "Voting-escrowed VRH",
@@ -58,8 +65,13 @@ def deploy_part_one(admin, confs=1, deployments_json=None):
         "veVRH_0.99",
         {"from": admin, "required_confs": confs},
     )
+    
+    print('deploy gas_escrow_template.')
     gas_escrow_template = GasEscrow.deploy({"from": admin, "required_confs": confs})
+    
+    print('deploy guild_template.')
     guild_template = Guild.deploy({"from": admin, "required_confs": confs})
+    
     deployments = {
         "ERC20VRH": token.address,
         "VotingEscrow": voting_escrow.address,

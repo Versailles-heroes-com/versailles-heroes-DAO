@@ -14,16 +14,16 @@ warnings.filterwarnings("ignore")
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
 VRH_DAO_OWNERSHIP = {
-    "agent": "0xA2D7fFaf8cd6C67e41E5372Be54260fe6591B3Ee",
-    "voting": "0xd4Da2E403bb4E155B46bd26508b8F51014F1dD09",
-    "token": "0xC858DB925e96B1dc4Fb3Af2e9AD215d16D9C4057",
+    "agent": "0x7562a1a1d28F9bD521E48B958d7ff3FEd7c3Ff91",
+    "voting": "0xD3cA8c18D3E594701392DEF683200EA09dB6deEf",
+    "token": "0x3b400213A480F9989Bb659F834d31De001f10670",
     "quorum": 30,
 }
 
 VRH_DAO_CREATE_GUILD = {
-    "agent": "0x9FAB5EfE2CAcc37a9a6da212987936B741428dAA",
-    "voting": "0x30A3c983bA81b8481ec48978babb78948Bb5e4f0",
-    "token": "0xC858DB925e96B1dc4Fb3Af2e9AD215d16D9C4057",
+    "agent": "0xD44D8a8c125D4EFD0517c05fe6C87957a0E37301",
+    "voting": "0xa6AaF7Ea9ed211068Edfe89C6eCADA0baeF7Bcf6",
+    "token": "0x3b400213A480F9989Bb659F834d31De001f10670",
     "quorum": 15,
 }
 
@@ -31,7 +31,7 @@ EMERGENCY_DAO = {
     "forwarder": "0xE5E94f76Cb6c7F250780319a786eCf94D8ccF2E6",
     "agent": "0x72f50a9016878e4ce837d5314355647484dc2d83",
     "voting": "0xb18811c42adb9fe8048c4912d137640ab3c79131",
-    "token": "0xe8dbd31b8ce6e69c6d78cfba67678faf21e09550",
+    "token": "0x3b400213A480F9989Bb659F834d31De001f10670",
     "quorum": 51,
 }
 
@@ -61,10 +61,18 @@ guildType = 0
 guildRate = 20
 ACTIONS = [
     # ("target", "fn_name", *args),
-    #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "name")
+    #("voting_escrow", "0xBC320aE0BEDF9a15f2b160786d59Bd903724961D", "name")
     #("voting_escrow", "0xF4B87E521759c93877dec0b31b17fE9f1805782E", "commit_transfer_ownership", "0x7155fa7cFB7D965d74d10250B59B1eE1a4b0eDd1")
     #("guild_controller", "0x360f9C1FDAee0273a60F057f208BcBe253F0244f", "commit_transfer_create_guild_ownership", '0x9FAB5EfE2CAcc37a9a6da212987936B741428dAA')
-    ("guild_controller", "0x360f9C1FDAee0273a60F057f208BcBe253F0244f", "apply_transfer_create_guild_ownership")
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "apply_transfer_create_guild_ownership")
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "add_type", "Gas OOH", "OOH", "0x352447f66bDAf66c7c6748E2C07051C5f4c93ecF", 1 * 10 ** 18)
+    ("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "add_type", "GasOOH", "OOH", "0x352447f66bDAf66c7c6748E2C07051C5f4c93ecF", 1 * 10 ** 18)
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "change_type_weight", 0, 30)
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "change_guild_weight", "0xAC6AFe8f4f43a1B3957cC666E498FDc301942090", 40)
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "toggle_pause", "0xAC6AFe8f4f43a1B3957cC666E498FDc301942090")
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "change_guild_contract", "0x0000Fe8f4f43a1B3957cC666E498FDc301942090")
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "commit_transfer_ownership", "0xFFFFFFFFFFFFa1B3957cC666E498FDc301942090")
+    #("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "apply_transfer_ownership")
 ]
 
 # description of the vote, will be pinned to IPFS

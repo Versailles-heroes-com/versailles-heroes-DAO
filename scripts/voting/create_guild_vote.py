@@ -7,16 +7,17 @@ from brownie import Contract, accounts, chain, config
 warnings.filterwarnings("ignore")
 
 TARGET = {
-    "agent": "0x9FAB5EfE2CAcc37a9a6da212987936B741428dAA",
-    "voting": "0x30A3c983bA81b8481ec48978babb78948Bb5e4f0",
-    "token": "0xC858DB925e96B1dc4Fb3Af2e9AD215d16D9C4057",
+    "agent": "0xD44D8a8c125D4EFD0517c05fe6C87957a0E37301",
+    "voting": "0xa6AaF7Ea9ed211068Edfe89C6eCADA0baeF7Bcf6",
+    "token": "0x3b400213A480F9989Bb659F834d31De001f10670",
     "quorum": 15,
 }
 
 # address to create the vote from - you will need to modify this prior to mainnet use
 accounts.add(config['wallets']['from_keys'])
 SENDER = accounts[0]
-create_guild_account = ''
+#create_guild_account = '0x9C7c50496386E75aAa435384c26A7FAd78B2b290'
+create_guild_account = '0xdA62500768bFBedBb5F81d1eec279385eEe9d51A'
 
 # a list of calls to perform in the vote, formatted as a lsit of tuples
 # in the format (target, function name, *input args).
@@ -36,7 +37,7 @@ guildType = 0
 guildRate = 20
 ACTIONS = [
     # ("target", "fn_name", *args),
-    ("guild_controller", "0x360f9C1FDAee0273a60F057f208BcBe253F0244f", "create_guild", create_guild_account, guildType, guildRate)
+    ("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "create_guild", create_guild_account, guildType, guildRate)
 ]
 
 # description of the vote, will be pinned to IPFS
@@ -79,7 +80,8 @@ def make_vote(sender=SENDER):
     else:
         aragon = proxy
     evm_script = prepare_evm_script()
-    print("vote numbers: %s", aragon.votesLength())
+    print("vote numbers: %s" % aragon.votesLength())
+    print(evm_script)
     # evm_script = '0x0000000140907540d8a6C65c637785e8f8B742ae6b0b996800000104b61d27f60000000000000000000000002f50d538606fa9edd2b11e2446beb18c9d5846bb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000006418dfe92100000000000000000000000069fb7c45726cfe2badee8317005d3f94be8388400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
     if TARGET.get("forwarder"):
         # the emergency DAO only allows new votes via a forwarder contract
@@ -88,11 +90,9 @@ def make_vote(sender=SENDER):
         length = hex(len(vote_calldata) // 2)[2:].zfill(8)
         evm_script = f"0x00000001{aragon.address[2:]}{length}{vote_calldata}"
         print(f"Target: {TARGET['forwarder']}\nEVM script: {evm_script}")
-        print(1)
         tx = Contract(TARGET["forwarder"]).forward(evm_script, {"from": sender})
     else:
         print(f"Target: {aragon.address}\nEVM script: {evm_script}")
-        print(2)
         tx = aragon.newVote(
             evm_script,
             f"ipfs:{ipfs_hash}",

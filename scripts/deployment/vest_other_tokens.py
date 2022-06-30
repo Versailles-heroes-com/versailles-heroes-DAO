@@ -1,8 +1,8 @@
 import json
 
-from brownie import ERC20CRV, VestingEscrow, accounts
+from brownie import ERC20VRH, VestingEscrow, config, accounts
 
-from . import deployment_config as config
+from . import deployment_config
 
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 YEAR = 86400 * 365
@@ -12,29 +12,33 @@ def live():
     """
     Vest tokens in a live environment.
     """
-    admin, _ = config.get_live_admin()
+    accounts.add(config['wallets']['from_keys'])
+    print("accounts: ", accounts)
+    admin, _ = deployment_config.get_live_admin()
 
-    with open(config.DEPLOYMENTS_JSON) as fp:
+    with open(deployment_config.DEPLOYMENTS_JSON) as fp:
         deployments = json.load(fp)
 
-    vest_tokens(admin, deployments["ERC20CRV"], config.REQUIRED_CONFIRMATIONS)
+    vest_tokens(admin, deployments["ERC20VRH"], deployment_config.REQUIRED_CONFIRMATIONS)
 
 
 def development():
     """
     Vest tokens in a development environment and validate the result.
     """
-    token = ERC20CRV.deploy("Curve DAO Token", "CRV", 18, {"from": accounts[0]})
+    token = ERC20VRH.deploy("Versailles Heroes Token", "VRH", 18, {"from": accounts[0]})
     vesting_escrow, vested_amounts = vest_tokens(accounts[0], token, 1)
     sanity_check(token, vesting_escrow, vested_amounts)
 
 
 def vest_tokens(admin, token_address, confs):
-    token = ERC20CRV.at(token_address)
+    admin = accounts.at(admin)
+    print("admin: ", admin)
+    token = ERC20VRH.at(token_address)
 
     # deploy standard escrows
     start_time = token.future_epoch_time_write.call()
-    for data in config.STANDARD_ESCROWS:
+    for data in deployment_config.STANDARD_ESCROWS:
 
         vesting_escrow = VestingEscrow.deploy(
             token,
@@ -64,14 +68,14 @@ def vest_tokens(admin, token_address, confs):
             vesting_escrow.apply_transfer_ownership({"from": admin, "required_confs": confs})
 
     print("\nStandard Escrows:")
-    for data in config.STANDARD_ESCROWS:
+    for data in deployment_config.STANDARD_ESCROWS:
         total_amount = sum(data["recipients"].values())
         print(
             f"  {data['contract'].address}: {len(data['recipients'])} recipients, "
             f"{total_amount} total tokens, {data['duration']/YEAR} year lock"
         )
 
-    return config.STANDARD_ESCROWS
+    return deployment_config.STANDARD_ESCROWS
 
 
 def sanity_check(token, standard_escrows):
