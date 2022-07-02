@@ -410,6 +410,7 @@ def create_guild(owner: address, guild_type: int128, commission_rate: uint256) -
         self.guild_types_[guild_address] = guild_type + 1
         self.guild_owner_list[owner] = guild_address
         self.global_member_list[owner] = guild_address
+        self.last_user_join[owner][guild_address] = block.timestamp
         log NewGuild(guild_address, weight, commission_rate)
         return guild_address
 
@@ -711,6 +712,7 @@ def refresh_guild_votes(user_addr: address, guild_addr: address):
 
 
 @external
+@view
 def belongs_to_guild(user_addr: address, guild_addr: address) -> bool:
     return self.global_member_list[user_addr] == guild_addr
 

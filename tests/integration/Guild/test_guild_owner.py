@@ -133,7 +133,7 @@ def test_set_commission_rate(chain, accounts, gas_token, guild_controller, Guild
     alice = accounts[0]
     bob = accounts[1]
     guild = create_guild(chain, guild_controller, gas_token, alice, Guild)
-    chain.sleep(2 * WEEK + 1)
+    chain.sleep(WEEK + 1)
     chain.mine()
     with brownie.reverts("Only guild owner can change commission rate"):
         guild.set_commission_rate(False, {"from": bob})
@@ -147,6 +147,9 @@ def test_set_commission_rate(chain, accounts, gas_token, guild_controller, Guild
     chain.mine()
     with brownie.reverts("Can only change commission rate once every week"):
         guild.set_commission_rate(False, {"from": alice})
+
+    chain.sleep(WEEK + 1)
+    guild.set_commission_rate(True, {"from": alice})
 
 
 def test_bonus_for_owner(chain, accounts, token, gas_token, guild_controller, Guild):
@@ -268,6 +271,7 @@ def test_transfer_ownership(chain, accounts, gas_token, guild_controller, Guild)
     guild_controller.transfer_guild_ownership(bob, {"from": alice})
     # check guild controller global owner list is bob
     assert guild.address == guild_controller.guild_owner_list(bob)
+    assert guild.address == guild_controller.global_member_list(alice)
 
     chain.sleep(10 * DAY + 1)
     chain.mine()
@@ -295,12 +299,29 @@ def test_transfer_ownership(chain, accounts, gas_token, guild_controller, Guild)
 
 def test_owner_leave_guild(chain, accounts, gas_token, guild_controller, Guild):
     alice = accounts[0]
+    bob = accounts[1]
     guild = create_guild(chain, guild_controller, gas_token, alice, Guild)
 
-    chain.sleep(2 * WEEK + 1)
+    chain.sleep(WEEK + 1)
     chain.mine()
     with brownie.reverts("Owner cannot leave guild"):
         guild.leave_guild({"from": alice})
+
+    # bob join guild as a member
+    guild.join_guild({"from": bob})
+    # transfer ownership to bob
+    guild_controller.transfer_guild_ownership(bob, {"from": alice})
+
+    chain.sleep(100)
+    chain.mine()
+    # alice leave guild failed
+    with brownie.reverts("Leave guild too soon"):
+        guild.leave_guild({"from": alice})
+
+    # alice leave guild
+    chain.sleep(3 * DAY)
+    chain.mine()
+    guild.leave_guild({"from": alice})
 
 
 def create_guild(chain, guild_controller, gas_token, guild_owner, Guild):
