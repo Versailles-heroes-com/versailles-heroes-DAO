@@ -395,6 +395,7 @@ def test_gas_escrow_create_end(chain, accounts, Guild, voting_escrow, token, gui
     gas_amount = 100000 * 10 ** 18
     # alice get boost
     setup_gas_token(accounts, alice, gas_amount, gas_token, guild_controller, GasEscrow)
+    assert gas_token.totalSupply() == 7999900000000000000000000000
     guild.user_checkpoint(alice, {"from": alice})
     # advance 4 yrs
     for i in range(8):

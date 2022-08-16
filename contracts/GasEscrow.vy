@@ -27,6 +27,7 @@ interface ERC20:
     def symbol() -> String[32]: view
     def transfer(to: address, amount: uint256) -> bool: nonpayable
     def transferFrom(spender: address, to: address, amount: uint256) -> bool: nonpayable
+    def burnFrom(account: address, amount: uint256): nonpayable
 
 
 # Interface for checking whether address belongs to a whitelisted
@@ -365,7 +366,7 @@ def _deposit_for(_addr: address, _value: uint256, end_time: uint256, burned_bala
     self._checkpoint(_addr, old_burned, _burned)
 
     if _value != 0:
-        assert ERC20(self.token).transferFrom(_addr, ZERO_ADDRESS, _value) # burn the tokens
+        ERC20(self.token).burnFrom(_addr, _value) # burn the tokens
 
     log Deposit(_addr, _value, _burned.end, type, block.timestamp)
     log Supply(supply_before, supply_before + _value)
