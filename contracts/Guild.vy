@@ -405,6 +405,9 @@ def transfer_ownership(new_owner: address):
     assert msg.sender == self.controller # only GuildController can access this
     old_owner: address = self.owner
     self._checkpoint(old_owner) # updates current owner integrate fraction and bonus before transferring ownership
+    _user_voting_power: uint256 = ERC20(self.voting_escrow).balanceOf(old_owner)
+    _guild_voting_power: uint256 = GuildController(self.controller).get_guild_weight(self)
+    self._update_liquidity_limit(old_owner, _user_voting_power, _guild_voting_power)
     self.owner = new_owner
 
 
