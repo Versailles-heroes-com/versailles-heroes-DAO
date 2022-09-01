@@ -27,7 +27,7 @@ interface Minter:
     def minted(user: address, guild: address) -> uint256: view
     def controller() -> address: view
     def token() -> address: view
-    def vestingEscrow() -> address: view
+    def rewardVestingEscrow() -> address: view
 
 interface VotingEscrow:
     def user_point_epoch(addr: address) -> uint256: view
@@ -38,7 +38,7 @@ interface GasEscrow:
     def user_point_history__ts(addr: address, epoch: uint256) -> uint256: view
 
 interface RewardVestingEscrow:
-    def claimable_tokens(addr: address) -> uint256: view
+    def claimable_tokens(addr: address) -> uint256: nonpayable
 
 
 DECIMALS: constant(uint256) = 10 ** 18
@@ -340,9 +340,9 @@ def claimable_tokens(addr: address) -> uint256:
     @return uint256 number of claimable tokens per user
     """
     self._checkpoint(addr)
-    _vestingEscrow: address = Minter(self.minter).vestingEscrow()
-    _vesting_claimable: uint256 = RewardVestingEscrow(_vestingEscrow).claimable_tokens(addr)
-    return self.integrate_fraction[addr] - Minter(self.minter).minted(addr, self) + _vesting_claimable
+    _rewardVestingEscrow: address = Minter(self.minter).rewardVestingEscrow()
+    _reward_vesting_claimable: uint256 = RewardVestingEscrow(_rewardVestingEscrow).claimable_tokens(addr)
+    return self.integrate_fraction[addr] - Minter(self.minter).minted(addr, self) + _reward_vesting_claimable
 
 
 @external
