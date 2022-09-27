@@ -91,9 +91,9 @@ def deploy_part_two(admin, token, voting_escrow, gas_escrow_template, guild_temp
         token, voting_escrow, guild_template, gas_escrow_template, {"from": admin, "required_confs": confs}
     )
     gas_token = ERC20Gas.deploy(
-        "Gas Escrowed Token", 
-        "MOH", 
-        18, 
+        "Gas Escrowed Token",
+        "MOH",
+        18,
         {"from": admin, "required_confs": confs}
     )
     for name, type, weight in GUILD_TYPES:

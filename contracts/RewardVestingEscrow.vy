@@ -27,6 +27,7 @@ event Claim:
     end: uint256
 
 event ClaimInfo:
+    recipient: indexed(address)
     epoch: uint256
     remain_amount: uint256
     claimed_amount: uint256
@@ -122,7 +123,7 @@ def _claimable_tokens(addr: address, _update: bool) -> uint256:
 
                     # accumulate total claimable amt
                     claimable += amt
-                    log ClaimInfo(epoch, user_vesting.amount, user_vesting.claimed, claimable, amt, user_vesting.start)
+                    log ClaimInfo(addr, epoch, user_vesting.amount, user_vesting.claimed, claimable, amt, user_vesting.start)
 
                     if _update:
                         # update the vesting record

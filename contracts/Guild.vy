@@ -27,7 +27,7 @@ interface Minter:
     def minted(user: address, guild: address) -> uint256: view
     def controller() -> address: view
     def token() -> address: view
-    def vestingEscrow() -> address: view
+    def rewardVestingEscrow() -> address: view
 
 interface VotingEscrow:
     def user_point_epoch(addr: address) -> uint256: view
@@ -38,7 +38,7 @@ interface GasEscrow:
     def user_point_history__ts(addr: address, epoch: uint256) -> uint256: view
 
 interface RewardVestingEscrow:
-    def claimable_tokens(addr: address) -> uint256: view
+    def claimable_tokens(addr: address) -> uint256: nonpayable
 
 
 DECIMALS: constant(uint256) = 10 ** 18
@@ -340,9 +340,9 @@ def claimable_tokens(addr: address) -> uint256:
     @return uint256 number of claimable tokens per user
     """
     self._checkpoint(addr)
-    _vestingEscrow: address = Minter(self.minter).vestingEscrow()
-    _vesting_claimable: uint256 = RewardVestingEscrow(_vestingEscrow).claimable_tokens(addr)
-    return self.integrate_fraction[addr] - Minter(self.minter).minted(addr, self) + _vesting_claimable
+    _rewardVestingEscrow: address = Minter(self.minter).rewardVestingEscrow()
+    _reward_vesting_claimable: uint256 = RewardVestingEscrow(_rewardVestingEscrow).claimable_tokens(addr)
+    return self.integrate_fraction[addr] - Minter(self.minter).minted(addr, self) + _reward_vesting_claimable
 
 
 @external
@@ -405,6 +405,9 @@ def transfer_ownership(new_owner: address):
     assert msg.sender == self.controller # only GuildController can access this
     old_owner: address = self.owner
     self._checkpoint(old_owner) # updates current owner integrate fraction and bonus before transferring ownership
+    _user_voting_power: uint256 = ERC20(self.voting_escrow).balanceOf(old_owner)
+    _guild_voting_power: uint256 = GuildController(self.controller).get_guild_weight(self)
+    self._update_liquidity_limit(old_owner, _user_voting_power, _guild_voting_power)
     self.owner = new_owner
 
 

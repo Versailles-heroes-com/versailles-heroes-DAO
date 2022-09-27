@@ -7,9 +7,9 @@ from brownie import Contract, accounts, chain, config
 warnings.filterwarnings("ignore")
 
 TARGET = {
-    "agent": "0xD44D8a8c125D4EFD0517c05fe6C87957a0E37301",
-    "voting": "0xa6AaF7Ea9ed211068Edfe89C6eCADA0baeF7Bcf6",
-    "token": "0x3b400213A480F9989Bb659F834d31De001f10670",
+    "agent": "0xdCfC0B64F3E948f0560ED3Ded93E56E82eA473dF",
+    "voting": "0xF6485c8c6C27a436d0dD1a482E062215fd804c73",
+    "token": "0xbE568fc7c39eC178d507F0E54c07533D4975eddc",
     "quorum": 15,
 }
 
@@ -37,7 +37,7 @@ guildType = 0
 guildRate = 20
 ACTIONS = [
     # ("target", "fn_name", *args),
-    ("guild_controller", "0x9bc8994cD9512C5d7BE4dC15c3c9B31E06F9daA3", "create_guild", create_guild_account, guildType, guildRate)
+    ("guild_controller", "0xF5Fec47D9b81596BeDB5f505C9434a899DDD9D0E", "create_guild", create_guild_account, guildType, guildRate)
 ]
 
 # description of the vote, will be pinned to IPFS
@@ -96,7 +96,7 @@ def make_vote(sender=SENDER):
         tx = aragon.newVote(
             evm_script,
             f"ipfs:{ipfs_hash}",
-            False,
+            True,
             False,
             {"from": sender, "priority_fee": "2 gwei"},
         )

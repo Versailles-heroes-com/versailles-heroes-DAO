@@ -1,6 +1,6 @@
 import json
 
-from brownie import ERC20VRH, VestingEscrow, config, accounts
+from brownie import ERC20VRH, VestingEscrow, chain, config, accounts
 
 from . import deployment_config
 
@@ -37,7 +37,8 @@ def vest_tokens(admin, token_address, confs):
     token = ERC20VRH.at(token_address)
 
     # deploy standard escrows
-    start_time = token.future_epoch_time_write.call()
+    #start_time = token.future_epoch_time_write.call()
+    start_time = chain.time() + 60 * 10 * 2
     for data in deployment_config.STANDARD_ESCROWS:
 
         vesting_escrow = VestingEscrow.deploy(
@@ -59,7 +60,7 @@ def vest_tokens(admin, token_address, confs):
         recipients = [i[0] for i in fund_inputs] + [ZERO_ADDRESS] * zeros
         amounts = [i[1] for i in fund_inputs] + [0] * zeros
 
-        vesting_escrow.fund(recipients, amounts, {"from": admin, "required_confs": confs})
+        #vesting_escrow.fund(recipients, amounts, {"from": admin, "required_confs": confs})
 
         if "admin" in data:
             vesting_escrow.commit_transfer_ownership(

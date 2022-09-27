@@ -144,17 +144,17 @@ def main():
         funding_admins,
         {"from": deployer, "required_confs": CONFS}
     ) """
-    vesting = repeat(
+    reward_vesting = repeat(
         RewardVestingEscrow.deploy,
         {"from": deployer, "required_confs": CONFS}
     )
     if SaveAbi:
-        save_abi(vesting, "vesting")
+        save_abi(reward_vesting, "reward_vesting")
     minter = repeat(
         Minter.deploy,
         token,
         guild_controller,
-        vesting,
+        reward_vesting,
         {"from": deployer, "required_confs": CONFS}
     )
     if SaveAbi:
@@ -163,18 +163,18 @@ def main():
     # setting minter
     repeat(token.set_minter, minter, {"from": deployer, "required_confs": CONFS})
     repeat(guild_controller.set_minter, minter, {"from": deployer, "required_confs": CONFS})
-    repeat(vesting.set_minter, minter, {"from": deployer, "required_confs": CONFS})
+    repeat(reward_vesting.set_minter, minter, {"from": deployer, "required_confs": CONFS})
 
     # add type
     repeat(guild_controller.add_type, GUILD_TYPES[0][0], GUILD_TYPES[0][1], gas_token, GUILD_TYPES[0][2], {"from": deployer, "required_confs": CONFS})
 
     # print info
     print("now:", now)
-    print("token: %s" % token)
-    print("gas_token: %s" % gas_token)
+    print("vrh_token: %s" % token)
+    print("moh_token: %s" % gas_token)
     print("guild_controller: %s" % guild_controller)
     print("voting_escrow: %s" % voting_escrow)
-    print("vesting: %s" % vesting)
+    print("reward_vesting: %s" % reward_vesting)
     print("minter: %s" % minter)
     print("gas_escrow_template: %s" % gas_escrow_template)
     print("guild_template: %s" % guild_template)
@@ -190,6 +190,6 @@ def main():
         repeat(voting_escrow.commit_transfer_ownership, ARAGON_AGENT, {"from": deployer, "required_confs": CONFS})
         repeat(voting_escrow.apply_transfer_ownership, {"from": deployer, "required_confs": CONFS})
 
-        # vesting transfer ownership to ARAGON_AGENT
-        repeat(vesting.commit_transfer_ownership, ARAGON_AGENT, {"from": deployer, "required_confs": CONFS})
-        repeat(vesting.apply_transfer_ownership, {"from": deployer, "required_confs": CONFS})
+        # reward_vesting transfer ownership to ARAGON_AGENT
+        repeat(reward_vesting.commit_transfer_ownership, ARAGON_AGENT, {"from": deployer, "required_confs": CONFS})
+        repeat(reward_vesting.apply_transfer_ownership, {"from": deployer, "required_confs": CONFS})
