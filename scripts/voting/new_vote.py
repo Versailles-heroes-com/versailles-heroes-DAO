@@ -14,8 +14,8 @@ warnings.filterwarnings("ignore")
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (voting)
 # as_proxy_for=0xa4D1a2693589840BABb7f3A44D14Fdf41b3bF1Fe (agent)
 VRH_DAO_OWNERSHIP = {
-    "agent": "0x1ea32Fc77717FD5A1670aaa4D32d8C985De4dD1B",
-    "voting": "0x589f85f56c3Fab07341402acc4A2B811F4F26ab3",
+    "agent": "0x72A00f20a8573C7B840D2bb69627e012fe3bf827",
+    "voting": "0xb6fDBa226F84D318a649eFB29a64A00de6a73549",
     "token": "0x9e33f34870A0b55C7A4219da9989f382136772f1",
     "quorum": 30,
 }

@@ -5,7 +5,7 @@ import time
 
 from brownie import (
     ERC20VRH,
-    ERC20Gas,
+    MOHToken,
     GasEscrow,
     Guild,
     GuildController,
@@ -75,7 +75,7 @@ def main():
     deployer = accounts.at(DEPLOYER)
     print("deployer: %s, balance: %s" % (deployer, deployer.balance()))
 
-    # deploy VRH and voting_escrow and gas_token.
+    # deploy VRH and voting_escrow and moh_token.
     token = repeat(
         ERC20VRH.deploy,
         "Vote Escrowed Token",
@@ -96,15 +96,16 @@ def main():
     )
     save_abi(voting_escrow, "voting_escrow")
 
-    gas_token = repeat(
-        ERC20Gas.deploy,
-        "Gas Escrowed Token",
+    moh_token = repeat(
+        MOHToken.deploy,
+        "Medal of Honour",
         "MOH",
-        18,
+        deployer,
+        1000_0000,
         {"from": deployer, "required_confs": CONFS}
     )
     if SaveAbi:
-        save_abi(gas_token, "gas_token")
+        save_abi(moh_token, "moh_token")
 
     # deploy guild_controller
     gas_escrow_template = repeat(
@@ -166,12 +167,12 @@ def main():
     repeat(reward_vesting.set_minter, minter, {"from": deployer, "required_confs": CONFS})
 
     # add type
-    repeat(guild_controller.add_type, GUILD_TYPES[0][0], GUILD_TYPES[0][1], gas_token, GUILD_TYPES[0][2], {"from": deployer, "required_confs": CONFS})
+    repeat(guild_controller.add_type, GUILD_TYPES[0][0], GUILD_TYPES[0][1], moh_token, GUILD_TYPES[0][2], {"from": deployer, "required_confs": CONFS})
 
     # print info
     print("now:", now)
     print("vrh_token: %s" % token)
-    print("moh_token: %s" % gas_token)
+    print("moh_token: %s" % moh_token)
     print("guild_controller: %s" % guild_controller)
     print("voting_escrow: %s" % voting_escrow)
     print("reward_vesting: %s" % reward_vesting)
