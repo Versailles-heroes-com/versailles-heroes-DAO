@@ -44,7 +44,6 @@ interface RewardVestingEscrow:
 DECIMALS: constant(uint256) = 10 ** 18
 
 TOKENLESS_PRODUCTION: constant(uint256) = 40
-BOOST_WARMUP: constant(uint256) = 2 * 7 * 86400
 
 minter: public(address)
 vrh_token: public(address)
@@ -278,7 +277,7 @@ def _update_liquidity_limit(addr: address, bu: uint256, S: uint256):
     lim: uint256 = bu * TOKENLESS_PRODUCTION / 100 # 0.4bu
 
     # Boost portion below : game tokens (gas)
-    if (S > 0) and (block.timestamp > self.period_timestamp[0] + BOOST_WARMUP) and wi > 0:
+    if (S > 0) and wi > 0:
         lim += S * wi / W * (100 - TOKENLESS_PRODUCTION) / 100
 
     lim = min(bu, lim)
