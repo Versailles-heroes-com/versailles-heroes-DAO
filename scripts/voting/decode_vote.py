@@ -1,4 +1,5 @@
 import warnings
+import json
 
 from brownie import Contract
 from hexbytes import HexBytes
@@ -11,21 +12,29 @@ VOTE_ID = 0
 # address of the contract where the vote was created
 # ownership votes: 0x7d4DB50e40F1dD52335000267596BC32d042FfbB
 # create guild votes: 0x6ED69a6f5893a8B7615155021e77ff49169C7752
-VOTING_ADDRESS = "0x2391f1c4059F1EE05D20510DdB335F4b4248BBF4"
+VOTING_ADDRESS = "0x9212063219d4c9c51f30fcde6f2bd935ce8ea0ff"
+VOTING_TYPE = "ovt" #ovt => ownership, cvt => create_guild, mvt => moh
 #VOTING_ADDRESS = "0xF6485c8c6C27a436d0dD1a482E062215fd804c73"
-
 
 def main(vote_id=VOTE_ID):
     print("decode vote:")
     print("vote address:", VOTING_ADDRESS)
+    print("vote type:", VOTING_TYPE)
     print("vote id:", vote_id)
-    proxy = Contract.from_explorer(VOTING_ADDRESS)
-    if hasattr(proxy, 'implementation'):
-        aragon = Contract.from_explorer(VOTING_ADDRESS, as_proxy_for=proxy.implementation())
-    else:
-        aragon = proxy
+    voting_abi = ''
+    if VOTING_TYPE == "ovt":
+        with open('./abi/aragon-ownership-voting.abi', 'r') as f:
+            voting_abi = json.loads(f.read())
+    elif VOTING_TYPE == "cvt":
+        with open('./abi/aragon-create-guild-voting.abi', 'r') as f:
+            voting_abi = json.loads(f.read())
+    elif VOTING_TYPE == "mvt":
+        with open('./abi/aragon-moh-ownership-voting.abi', 'r') as f:
+            voting_abi = json.loads(f.read())
 
-    evm_script = aragon.getVote(vote_id)
+    voting = Contract.from_abi("Voting", VOTING_ADDRESS, voting_abi)
+
+    evm_script = voting.getVote(vote_id)
     print("evm_script:")
     print("open: %s, executed: %s, startDate: %s, snapshotBlock: %s" % (evm_script['open'], evm_script['executed'], evm_script['startDate'], evm_script['snapshotBlock']))
     print("supportRequired: %s, minAcceptQuorum: %s" % (evm_script['supportRequired'], evm_script['minAcceptQuorum']))
